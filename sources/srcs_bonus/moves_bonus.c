@@ -1,44 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   moves.c                                            :+:      :+:    :+:   */
+/*   moves_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: chilee <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/18 17:02:38 by chilee            #+#    #+#             */
-/*   Updated: 2022/01/26 14:12:39 by chilee           ###   ########.fr       */
+/*   Created: 2022/01/26 11:57:02 by chilee            #+#    #+#             */
+/*   Updated: 2022/01/28 11:57:21 by chilee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/so_long.h"
+#include "../../includes/so_long_bonus.h"
 
 /*
-** Checks wanted destination and updates games data according to it
+** Checks wanted destination and updates data according to it
 */
-
-void	update_matrixnplayer(t_game *game, void *newplayerimg, int c)
+void	update_matrixnplayer(t_game *game)
 {
 	game->map[game->y][game->x] = '0';
-	game->moves++;
 	mlx_destroy_image(game->mlx_ptr, game->p);
-	game->p = mlx_xpm_file_to_image(game->mlx_ptr, newplayerimg,
+	game->moves++;
+	count_frames(game);
+	animate_player(game);
+	game->p = mlx_xpm_file_to_image(game->mlx_ptr, game->img_direction,
 			&game->img_width, &game->img_height);
 	ft_putstr("\e[1;1H\e[2J");
 	print_ascii();
-	ft_putstr(KGRN"MOVES = ");
+	ft_putstr(KGRN"MOVE = ");
 	ft_putnbr_fd(game->moves, 1);
 	ft_putchar_fd('\n', 1);
 	printf("Bottle of wine that you drunk : %d/%d\n", game->collected,
 		game->total_collectibles);
-	if (c)
-	{
-		ft_putstr(KYEL"Don't drink too much !\nRemaining Liquor(s): ");
-		ft_putnbr_fd((game->total_collectibles) - (game->collected), 1);
-		ft_putstr("\n");
-	}
+	ft_putstr(KYEL"Don't drink too much !\nRemaining Liquor(s): ");
+	ft_putnbr_fd((game->total_collectibles) - (game->collected), 1);
+	ft_putstr("\n");
 	if (game->game_over == 1)
 	{
-		ft_putstr(KYEL"win!\nPress ESC or red cross to close windows\n"KNRM);
+		ft_putstr(KYEL"win!\nPress ESC or red cross to close window\n"KNRM);
 		mlx_put_image_to_window(game->mlx_ptr, game->mlx_win,
 			game->end_mess, 80, 80);
 		mlx_loop(game->mlx_ptr);
@@ -55,19 +53,21 @@ void	move_up(t_game *game)
 	if (game->map[y - 1][x] == '0')
 	{
 		game->map[y - 1][x] = 'P';
-		update_matrixnplayer(game, PLAYER_W, 0);
+		game->direction = 1;
+		update_matrixnplayer(game);
 	}
-	else if (game->map[y - 1][x] == 'C')
+	else if (game->map[y -1][x] == 'C')
 	{
 		game->map[y - 1][x] = 'P';
+		game->direction = 1;
 		game->collected++;
-		update_matrixnplayer(game, PLAYER_W, 1);
+		update_matrixnplayer(game);
 	}
 	else if (game->map[y - 1][x] == 'E'
-			&& game->collected == game->total_collectibles)
+		&& game->collected == game->total_collectibles)
 	{
 		game->game_over = 1;
-		update_matrixnplayer(game, EXIT_E, 0);
+		update_matrixnplayer(game);
 	}
 }
 
@@ -81,19 +81,21 @@ void	move_left(t_game *game)
 	if (game->map[y][x - 1] == '0')
 	{
 		game->map[y][x - 1] = 'P';
-		update_matrixnplayer(game, PLAYER_A, 0);
+		game->direction = 4;
+		update_matrixnplayer(game);
 	}
 	else if (game->map[y][x - 1] == 'C')
 	{
 		game->map[y][x - 1] = 'P';
+		game->direction = 4;
 		game->collected++;
-		update_matrixnplayer(game, PLAYER_A, 1);
+		update_matrixnplayer(game);
 	}
 	else if (game->map[y][x - 1] == 'E'
-			&& game->collected == game->total_collectibles)
+		&& game->collected == game->total_collectibles)
 	{
 		game->game_over = 1;
-		update_matrixnplayer(game, EXIT_E, 0);
+		update_matrixnplayer(game);
 	}
 }
 
@@ -107,19 +109,21 @@ void	move_down(t_game *game)
 	if (game->map[y + 1][x] == '0')
 	{
 		game->map[y + 1][x] = 'P';
-		update_matrixnplayer(game, PLAYER_S, 0);
+		game->direction = 3;
+		update_matrixnplayer(game);
 	}
-	else if (game->map[y + 1][x] == 'C')
+	else if (game->map[y +1][x] == 'C')
 	{
 		game->map[y + 1][x] = 'P';
+		game->direction = 3;
 		game->collected++;
-		update_matrixnplayer(game, PLAYER_S, 1);
+		update_matrixnplayer(game);
 	}
 	else if (game->map[y + 1][x] == 'E'
-			&& game->collected == game->total_collectibles)
+		&& game->collected == game->total_collectibles)
 	{
 		game->game_over = 1;
-		update_matrixnplayer(game, EXIT_E, 0);
+		update_matrixnplayer(game);
 	}
 }
 
@@ -133,18 +137,20 @@ void	move_right(t_game *game)
 	if (game->map[y][x + 1] == '0')
 	{
 		game->map[y][x + 1] = 'P';
-		update_matrixnplayer(game, PLAYER_D, 0);
+		game->direction = 2;
+		update_matrixnplayer(game);
 	}
 	else if (game->map[y][x + 1] == 'C')
 	{
 		game->map[y][x + 1] = 'P';
+		game->direction = 2;
 		game->collected++;
-		update_matrixnplayer(game, PLAYER_D, 1);
+		update_matrixnplayer(game);
 	}
 	else if (game->map[y][x + 1] == 'E'
-			&& game->collected == game->total_collectibles)
+		&& game->collected == game->total_collectibles)
 	{
 		game->game_over = 1;
-		update_matrixnplayer(game, EXIT_E, 0);
+		update_matrixnplayer(game);
 	}
 }

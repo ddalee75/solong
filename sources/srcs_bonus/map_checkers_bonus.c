@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   map_checkers.c                                     :+:      :+:    :+:   */
+/*   map_checkers_bonus.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: chilee <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 18:39:39 by chilee            #+#    #+#             */
-/*   Updated: 2022/01/27 16:26:09 by chilee           ###   ########.fr       */
+/*   Created: 2022/01/25 15:36:26 by chilee            #+#    #+#             */
+/*   Updated: 2022/01/28 11:51:46 by chilee           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/so_long.h"
+#include "../../includes/so_long_bonus.h"
 
-void	check_init(t_checks *check)
+void	checks_init(t_checks *check)
 {
 	check->p = 0;
 	check->e = 0;
@@ -20,25 +20,12 @@ void	check_init(t_checks *check)
 }
 
 /*
-** Checks File extension
-*/
-int	check_file_type(char *file)
-{
-	if (!file || !ft_strchr(file, '.')
-		|| (ft_strcmp(ft_strrchr(file, '.'), ".ber") != 0)
-		|| (!file[ft_strrchri(file, '.') - 1])
-		|| ((ft_strcmp((&file[ft_strchr_gnl(file, '.') - 1]), "/.ber") == 0)))
-		return (FILERROR);
-	return (0);
-}
-
-/*
 ** Check if only authorized chars are in the map
 */
 int	check_chars(char **map)
 {
-	int		y;
-	int		x;
+	int	x;
+	int	y;
 
 	y = 0;
 	while (map[y])
@@ -46,8 +33,8 @@ int	check_chars(char **map)
 		x = 0;
 		while (map[y][x])
 		{
-			if (map[y][x] != '0' && map[y][x] != '1' && map[y][x] != 'C'
-				&& map[y][x] != 'P' && map[y][x] != 'E')
+			if (map[y][x] != '0' && map[y][x] != 'P' && map[y][x] != 'C'
+						&& map[y][x] != '1' && map[y][x] != 'E')
 				return (CHARERROR);
 			x++;
 		}
@@ -57,12 +44,12 @@ int	check_chars(char **map)
 }
 
 /*
-** Check if walls are valid and Rows are all the same length
+** Checks if walls are valid and check if rows are all the same length
 */
 int	check_rowsnwalls(char **map)
 {
-	int		y;
 	size_t	x;
+	int		y;
 	int		right_wall;
 	int		last_row;
 
@@ -76,8 +63,8 @@ int	check_rowsnwalls(char **map)
 		right_wall = ft_strlen(map[y]) - 1;
 		while (map[y][x])
 		{
-			if (map[0][x] != '1' || map [y][0] != '1'
-					|| map[y][right_wall] != '1' || map[last_row - 1][x] != '1')
+			if (map[0][x] != '1' || map[last_row - 1][x] != '1'
+					|| map[y][0] != '1' || map[y][right_wall] != '1')
 				return (WALLERROR);
 			x++;
 		}
@@ -89,12 +76,12 @@ int	check_rowsnwalls(char **map)
 }
 
 /*
-** Check numbers of Player(1), at leat 1 Exit, 1 Collectible
+** Check if only one player, and at least one exit, one collectible
 */
 int	check_counts(char **map, t_checks *check)
 {
-	int	y;
 	int	x;
+	int	y;
 
 	y = 0;
 	while (map[y])
@@ -114,5 +101,19 @@ int	check_counts(char **map, t_checks *check)
 	}
 	if (check->p != 1 || check->e < 1 || check->c == 0)
 		return (COUNTERROR);
+	return (0);
+}
+
+/*
+** Check file extention, si "." ".ber" "*.ber" et ".ber pas repertoire"
+*/
+int	check_file_type(char *file)
+{
+	if (!file
+		|| !ft_strchr(file, '.')
+		|| (ft_strcmp(ft_strrchr(file, '.'), ".ber") != 0)
+		|| (!file[ft_strrchri(file, '.') - 1])
+		|| ((ft_strcmp((&file[ft_strchr_gnl(file, '.') - 1]), "/.ber") == 0)))
+		return (FILERROR);
 	return (0);
 }
